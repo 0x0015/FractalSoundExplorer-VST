@@ -26,12 +26,12 @@ protected:
 
     const char* getLabel() const noexcept override
     {
-        return "Node Plugin";
+        return "FractalSoundExplorer";
     }
 
     const char* getDescription() const override
     {
-        return "A node graph of more simple effects to give more interesting resuls.";
+        return "The Fractal Sound explorer plugin.";
     }
 
     const char* getMaker() const noexcept override
@@ -85,7 +85,7 @@ private:
     float fInputVolume;
     bool running = true;
     std::thread GUIthread;
-    Synth synth;
+    Synth* synth;
     //std::vector<audioNode*> nodes;
     //audioNodeInput* inputNode1;
     //audioNodeOutput* outputNode1;

@@ -15,7 +15,7 @@
 
 //Constants
 static const int target_fps = 60;
-static const int sample_rate = 41100;
+static int sample_rate = 41100;
 static const int max_freq = 4000;
 static const int window_w_init = 1280;
 static const int window_h_init = 720;
@@ -137,7 +137,8 @@ public:
   bool audio_reset;
 
   static const int NUM_AUDIO_BUFFS = 5;
-  static const int AUDIO_BUFF_SIZE = 4196;
+  double DEFAULT_VOLUME = 1;
+  int AUDIO_BUFF_SIZE = 4196;
 
 struct Chunk {
     int16_t* samples;
@@ -155,7 +156,7 @@ struct Chunk {
   Synth(){
     audio_reset = true;
     audio_pause = false;
-    volume = 8000.0;
+    volume = DEFAULT_VOLUME;
     play_x = 0.0;
     play_y = 0.0;
     play_cx = 0.0;
@@ -190,7 +191,7 @@ struct Chunk {
       play_py = play_ny;
       mean_x = play_nx;
       mean_y = play_ny;
-      volume = 8000.0;
+      volume = DEFAULT_VOLUME;
       audio_reset = false;
     }
 
@@ -201,7 +202,7 @@ struct Chunk {
 
     //Generate the tones
     const int steps = sample_rate / max_freq;
-    for (int i = 0; i < frames; i+=2) {
+    for (int i = 0; i < frames; i++) {
       const int j = m_audio_time % steps;
       if (j == 0) {
         play_px = play_x;
@@ -257,13 +258,13 @@ struct Chunk {
 
       //Cosine interpolation
       double t = double(j) / double(steps);
-      t = 0.5 - 0.5*std::cos(t * 3.14159);
+      t = 0.5 - 0.5*std::cos(t * 3.141592653589);
       double wx = t*dx + (1.0 - t)*dpx;
       double wy = t*dy + (1.0 - t)*dpy;
 
       //Save the audio to the 2 channels
-      *out1++ = (int16_t)std::min(std::max(wx * volume, -32000.0), 32000.0);
-      *out2++ = (int16_t)std::min(std::max(wy * volume, -32000.0), 32000.0);
+      *out1++ = std::min(std::max(wx * volume, -32000.0), 32000.0);
+      *out2++ = std::min(std::max(wy * volume, -32000.0), 32000.0);
       m_audio_time += 1;
     }
 
@@ -271,7 +272,7 @@ struct Chunk {
     return !audio_reset;
   }
 
-  int16_t m_samples[AUDIO_BUFF_SIZE];
+  //int16_t m_samples[AUDIO_BUFF_SIZE];
   int32_t m_audio_time;
   double mean_x;
   double mean_y;

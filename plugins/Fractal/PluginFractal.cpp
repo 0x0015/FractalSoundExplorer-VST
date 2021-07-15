@@ -13,6 +13,7 @@ DistrhoPluginFractal::DistrhoPluginFractal()
       ReadWrite(false),
       EnvOld(0.0f)
 {
+	synth = new Synth();
 }
 
 // -----------------------------------------------------------------------
@@ -82,7 +83,9 @@ void DistrhoPluginFractal::activate()
     ReadWrite = false;
     EnvOld = 0.0f;
     running = true;
-    GUIthread = std::thread(fractal_main, &running, &synth);
+    sample_rate = getSampleRate();
+    synth->AUDIO_BUFF_SIZE = getBufferSize();
+    GUIthread = std::thread(fractal_main, &running, synth);
 }
 
 void DistrhoPluginFractal::deactivate(){
@@ -105,7 +108,7 @@ void DistrhoPluginFractal::run(const float** inputs, float** outputs, uint32_t f
     const float* in2  =  inputs[1];
     float* out2 = outputs[1];
 
-    synth.onGetData(out1, out2, frames);
+    synth->onGetData(out1, out2, frames);
     return;
 
 }
@@ -113,7 +116,7 @@ void DistrhoPluginFractal::run(const float** inputs, float** outputs, uint32_t f
 
 Plugin* createPlugin()
 {
-    return new DistrhoPluginFractal();
+    return(new DistrhoPluginFractal());
 }
 
 // -----------------------------------------------------------------------
